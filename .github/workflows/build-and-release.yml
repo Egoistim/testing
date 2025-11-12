@@ -71,16 +71,6 @@ jobs:
       run: |
         cp testing release/
 
-    - name: Create release notes
-      run: |
-        echo "# Release ${{ github.ref_name }}" > release/RELEASE_NOTES.md
-        echo "## Build Information" >> release/RELEASE_NOTES.md
-        echo "- OS: Linux (Ubuntu)" >> release/RELEASE_NOTES.md
-        echo "- Build Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> release/RELEASE_NOTES.md
-        echo "- Commit: ${{ github.sha }}" >> release/RELEASE_NOTES.md
-        echo "## Changes" >> release/RELEASE_NOTES.md
-        echo "- Automated build from commit ${{ github.sha }}" >> release/RELEASE_NOTES.md
-
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -162,7 +152,6 @@ jobs:
           artifacts/windows/testing.exe
           artifacts/windows/RELEASE_NOTES.md
           artifacts/linux/testing
-          artifacts/linux/RELEASE_NOTES.md
         draft: false
         prerelease: false
         generate_release_notes: true
