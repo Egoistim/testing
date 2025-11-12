@@ -43,7 +43,7 @@ jobs:
         echo - Automated build from commit ${{ github.sha }} >> release\RELEASE_NOTES.md
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: windows-binary
         path: |
