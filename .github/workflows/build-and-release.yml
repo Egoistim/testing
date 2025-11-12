@@ -1,4 +1,4 @@
-name: Build and Release Windows
+name: Build and Release Multi-Platform
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
     
     steps:
@@ -48,8 +48,49 @@ jobs:
           release/
         retention-days: 30
 
+  build-linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Build C program
+      run: |
+        gcc testing.c -o testing
+        echo "Build completed successfully"
+        ls -la testing
+
+    - name: Create release directory
+      run: |
+        mkdir -p release
+
+    - name: Copy binary to release directory
+      run: |
+        cp testing release/
+
+    - name: Create release notes
+      run: |
+        echo "# Release ${{ github.ref_name }}" > release/RELEASE_NOTES.md
+        echo "## Build Information" >> release/RELEASE_NOTES.md
+        echo "- OS: Linux (Ubuntu)" >> release/RELEASE_NOTES.md
+        echo "- Build Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> release/RELEASE_NOTES.md
+        echo "- Commit: ${{ github.sha }}" >> release/RELEASE_NOTES.md
+        echo "## Changes" >> release/RELEASE_NOTES.md
+        echo "- Automated build from commit ${{ github.sha }}" >> release/RELEASE_NOTES.md
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-binary
+        path: |
+          release/
+        retention-days: 30
+
   create-release:
-    needs: build
+    needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     
@@ -64,11 +105,17 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Download artifact
+    - name: Download Windows artifact
       uses: actions/download-artifact@v4
       with:
         name: windows-binary
-        path: artifacts/
+        path: artifacts/windows/
+
+    - name: Download Linux artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: linux-binary
+        path: artifacts/linux/
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
@@ -84,17 +131,25 @@ jobs:
           - **Tag**: ${{ github.ref_name }}
           - **Commit**: ${{ github.sha }}
           - **Date**: ${{ github.event.head_commit.timestamp }}
-          - **Platform**: Windows
+          - **Platforms**: Windows, Linux (Ubuntu)
           
-          ### Available Binary
-          - **Windows**: `testing.exe`
+          ### Available Binaries
+          - **Windows**: `testing.exe` (executable for Windows)
+          - **Linux**: `testing` (executable for Linux/Ubuntu)
           
           ### Build Process
-          The C program was compiled using GCC on Windows.
+          The C program was compiled using GCC on both Windows and Linux platforms.
           
           ### Usage
+          **Windows:**
           ```bash
           testing.exe
+          ```
+          
+          **Linux/Ubuntu:**
+          ```bash
+          chmod +x testing
+          ./testing
           ```
           
           ### Source Code
@@ -104,8 +159,10 @@ jobs:
           Automated build from commit ${{ github.sha }}.
           
         files: |
-          artifacts/testing.exe
-          artifacts/RELEASE_NOTES.md
+          artifacts/windows/testing.exe
+          artifacts/windows/RELEASE_NOTES.md
+          artifacts/linux/testing
+          artifacts/linux/RELEASE_NOTES.md
         draft: false
         prerelease: false
         generate_release_notes: true
