@@ -32,15 +32,13 @@ jobs:
 
     - name: Create release notes
       run: |
-        echo # Release ${{ github.ref_name }} > release\RELEASE_NOTES.md
-        echo. >> release\RELEASE_NOTES.md
-        echo ## Build Information >> release\RELEASE_NOTES.md
-        echo - OS: Windows >> release\RELEASE_NOTES.md
-        echo - Build Date: %date% %time% >> release\RELEASE_NOTES.md
-        echo - Commit: ${{ github.sha }} >> release\RELEASE_NOTES.md
-        echo. >> release\RELEASE_NOTES.md
-        echo ## Changes >> release\RELEASE_NOTES.md
-        echo - Automated build from commit ${{ github.sha }} >> release\RELEASE_NOTES.md
+        echo "# Release ${{ github.ref_name }}" > release\RELEASE_NOTES.md
+        echo "## Build Information" >> release\RELEASE_NOTES.md
+        echo "- OS: Windows" >> release\RELEASE_NOTES.md
+        echo "- Build Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" >> release\RELEASE_NOTES.md
+        echo "- Commit: ${{ github.sha }}" >> release\RELEASE_NOTES.md
+        echo "## Changes" >> release\RELEASE_NOTES.md
+        echo "- Automated build from commit ${{ github.sha }}" >> release\RELEASE_NOTES.md
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
