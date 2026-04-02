@@ -16,10 +16,13 @@ engine:
   id: codex
   env:
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-    OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL }}
+    OPENAI_BASE_URL: https://api-vip.codex-for.me/v1
 strict: true
 timeout-minutes: 8
-network: defaults
+network:
+  allowed:
+    - defaults
+    - api-vip.codex-for.me
 concurrency:
   group: gh-aw-issue-review-${{ github.event.issue.number }}
   cancel-in-progress: true
