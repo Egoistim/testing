@@ -16,7 +16,7 @@ engine:
   id: codex
   env:
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-    OPENAI_BASE_URL: https://api-vip.codex-for.me/v1
+    OPENAI_BASE_URL: https://api-vip.codex-for.me
 strict: true
 timeout-minutes: 8
 network:
