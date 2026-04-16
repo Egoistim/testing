@@ -1,4 +1,3 @@
-# Readme
-just a personal testing repo
+# testing
 
-life is short
+A personal experiment repository for trying out ideas and small tests.
